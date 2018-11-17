@@ -8,7 +8,11 @@
 #include <fstream>
 //#include "point.cpp"
 
-using namespace std;
+
+namespace My_math
+{
+namespace Vec
+{
 
 template <typename T>
 class Vector
@@ -42,7 +46,7 @@ public:
             *(data+i) = 0;
     }
 
-    Vector(initializer_list<T> list)
+    Vector(std::initializer_list<T> list)
         //: my_size(list.size()), coords(new T[my_size])
     {
         my_size = list.size();
@@ -61,7 +65,7 @@ public:
         v.data = nullptr;
         v.data = 0;
 
-        cout << "[Vector] Move constr.\n";
+        std::cout << "[Vector] Move constr.\n";
     }
 
     Vector& operator=(Vector<T>&& v)    // Перемещающий оператор присваивания
@@ -69,7 +73,7 @@ public:
         assert(my_size == v.my_size);
 
         std::swap(data, v.data);
-        cout << "[Vector] Move op. =\n";
+        std::cout << "[Vector] Move op. =\n";
         return *this;
     }
     /*
@@ -113,10 +117,10 @@ public:
     size_t getSize() const { return my_size; }
 
     template <typename Type>
-    friend ostream& operator<<(ostream& stream, const Vector<Type>& v);
+    friend std::ostream& operator<<(std::ostream& stream, const Vector<Type>& v);
 
     template <typename Type>
-    friend istream& operator>>(istream& stream, Vector<Type>& v);
+    friend std::istream& operator>>(std::istream& stream, Vector<Type>& v);
 
     template <typename Type>
     friend Vector<Type> operator+(const Vector<Type>& v, const Vector<Type>& u);
@@ -196,7 +200,7 @@ const T Vector<T>::at(size_t i) const
 }
 
 template <typename T>
-ostream& operator<<(ostream& stream, const Vector<T>& v)
+std::ostream& operator<<(std::ostream& stream, const Vector<T>& v)
 {
     stream <<"( ";
     for (size_t i = 0; i < v.my_size; i++)
@@ -207,9 +211,9 @@ ostream& operator<<(ostream& stream, const Vector<T>& v)
 }
 
 template <typename T>
-istream& operator>>(istream& stream, Vector<T>& v)
+std::istream& operator>>(std::istream& stream, Vector<T>& v)
 {
-    cout << "Enter coords: ";
+    std::cout << "Enter coords: ";
     for (size_t i = 0; i < v.getSize(); i++)
         stream >> v.data[i];
 
@@ -223,8 +227,8 @@ void Vector<T>::fileIn()
     {
     T arr[this->my_size];
 
-    ifstream in_file;     // Создать поток ввода из файла.
-    in_file.open("Vector.DAT", ios::binary); // Открыть поток
+    std::ifstream in_file;     // Создать поток ввода из файла.
+    in_file.open("Vector.DAT", std::ios::binary); // Открыть поток
     if (!in_file)
     {
         throw exceptIn();
@@ -242,7 +246,7 @@ void Vector<T>::fileIn()
     }
     catch(exceptIn& ex)
     {
-        cout << "Input error.\n";
+        std::cout << "Input error.\n";
     }
 }
 
@@ -257,9 +261,9 @@ void Vector<T>::fileOut()
         arr[i] = this->data[i];
     }
 
-    ofstream out_file;   // Создать поток вывода в файл.
+    std::ofstream out_file;   // Создать поток вывода в файл.
     // Открыть потко вывода в файл.
-    out_file.open("Vector.DAT", ios::app | ios::binary);
+    out_file.open("Vector.DAT", std::ios::app | std::ios::binary);
     if (!out_file)
     {
         throw exceptOut();
@@ -272,7 +276,7 @@ void Vector<T>::fileOut()
     }
     catch(exceptOut& ex)
     {
-        cout << "Output error.\n";
+        std::cout << "Output error.\n";
     }
 }
 
@@ -281,18 +285,18 @@ void Vector<T>::fileInPos(int position)
 {
     T arr[this->my_size];
 
-    ifstream in_file("Vector.DAT", ios::binary);
+    std::ifstream in_file("Vector.DAT", std::ios::binary);
     if (!in_file)
     {
         throw exceptIn();
     }
 
-    in_file.seekg(0, ios::end);
+    in_file.seekg(0, std::ios::end);
     // Вернуть указатель чтения на конечную позицию
     int endposition = in_file.tellg();
     // Найти кол-во векторов в файле
     int n = endposition / sizeof(T);
-    cout << "In file " << n << " vectors.\n";
+    std::cout << "In file " << n << " vectors.\n";
     // Вычислить позицию для чтения
     int position_in_file = (position-1) * this->my_size * sizeof(T);
     in_file.seekg(position_in_file); // Установить указатель чтения
@@ -308,7 +312,7 @@ void Vector<T>::fileInPos(int position)
 template <typename T>
 void Vector<T>::fileOut_text()
 {
-    ofstream out_st;
+    std::ofstream out_st;
     out_st.open("Vector.txt");
     for (size_t i = 0; i < this->my_size; i++)
         out_st << this->data[i] << " ";
@@ -319,7 +323,7 @@ void Vector<T>::fileOut_text()
 template <typename T>
 void Vector<T>::fileIn_text()
 {
-    ifstream in_st;
+    std::ifstream in_st;
     in_st.open("Vector.txt");
     in_st >> *this;
     in_st.close();
@@ -382,7 +386,7 @@ template <typename T>
 auto dotProductAlg(const Vector<T>& v, const Vector<T>& u)
 {
     assert(v.getSize() == u.getSize());
-    vector<T> res;
+    std::vector<T> res;
     T sum;
     res.resize(v.getSize());
     for (auto& it : res)
@@ -411,7 +415,7 @@ auto Vector<T>::absVec() const
 template <typename T>
 auto simpleFoo(Vector<T> v)
 {
-    cout << v << "Simple Foo\n";
+    std::cout << v << "Simple Foo\n";
     return v;
 }
 /*
@@ -427,3 +431,5 @@ auto createVector(const Vector<T> v)
     return
 }
 */
+}
+}
