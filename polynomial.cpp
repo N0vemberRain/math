@@ -2,7 +2,9 @@
 #include <cstdlib>
 #include <cassert>
 #include <fstream>
+#include <vector>
 #include <initializer_list>
+#include <cmath>
 
 namespace My_math
 {
@@ -29,15 +31,12 @@ public:
     void setCoef();
     void setRang(const int N);
     int getRang() const { return this->rang; }
-    value_type& getCoeff(size_t index) { assert(index >= 0 && index <= rang);
-                                        return coefficient[index]; }
-    const value_type& getCoeff(size_t index) const
-    { assert(index >= 0 && index <= rang);
-                                        return coefficient[index]; }
-    //auto evaluate(const float x);        // Вычислить
+    value_type& getCoeff(const size_t index);
+    const value_type& getCoeff(const size_t index) const;
+    void randomPoly();
 
     template <class Type>
-    friend Polynomial operator+(Polynomial<Type>& p, Polynomial<Type>& q);
+    friend Polynomial operator+(Polynomial<Type>&& p, const Polynomial<Type>& q);
 
     template <class Type>
     friend std::ostream& operator<<(std::ostream& stream, Polynomial<T>&& p);
@@ -48,7 +47,6 @@ public:
 private:
     unsigned rang;                    // Степень многочлена
     value_type *coefficient;     // Указатель на массив коэффициентов
-    float x;
 };
 
 template <typename T>
@@ -96,6 +94,45 @@ template <typename T>
 Polynomial<T>::~Polynomial() { delete[] coefficient; }
 
 template <typename T>
+T& Polynomial<T>::getCoeff(const size_t index)
+{
+    assert(index >= 0 && index <= rang);
+    return coefficient[index];
+}
+
+template <typename T>
+const T& Polynomial<T>::getCoeff(const size_t index) const
+{
+    assert(index >= 0 && index <= rang);
+    return coefficient[index];
+}
+/*
+template <class T>
+void Polynomial<T>::randomPoly()
+{
+    std::vector<int> temp1[rang];
+    std::vector<int> temp2[rang];
+    for (auto& it : temp1)
+    {
+        *it = rand() % 10 + 1;
+    }
+    static_cast<float>(temp1);
+    for (auto& it : temp2)
+    {
+        *it = rand() % 10 + 1;
+    }
+    static_cast<float>(temp2);
+    for (auto& it : temp2)
+    {
+        *it = *it / 10;
+    }
+    for (size_t i = 0; i < rang; i++)
+    {
+        getCoeff(i) = temp1 + temp2;
+    }
+}
+*/
+template <typename T>
 std::ostream& operator<<(std::ostream& stream, Polynomial<T>&& poly)
 {
     for (size_t i = 0; i < poly.getRang() - 1; i++)
@@ -104,108 +141,55 @@ std::ostream& operator<<(std::ostream& stream, Polynomial<T>&& poly)
     return stream;
 }
 
-/*
 template <typename Poly_type, typename Value_type>
 auto evaluate(Polynomial<Poly_type>&& poly, Value_type x)
 {
-
-}
-/*
-template <class Number>
-float Polynomial<Number>::evaluate(float x)
-{
-    double t = 0.0;
-    for (int i = n - 1; i >= 0; i--)
-        t = t*x + a[i];
-    return t;
-}
-
-template <class Number>
-void Polynomial<Number>::setCoef()
-{
-    for (int i = 0; i < n; i++)
-        a[i] = rand() % 10 + 1;
-}
-
-template <class Number>
-void Polynomial<Number>::setRang(int N)
-{
-    this->n = N+1;
-    delete[] this->a;
-    this->a = new Number[N+1];
-    for (int i = 0; i < this->n; i++)
+    auto res = 0.0;
+    for (size_t i = 0; i < std::move(poly.getRang()); i++)
     {
-        a[i] = 0;
+        res += std::move(poly.getCoeff(i)) * pow(x, i);
+    }
+    return res;
+}
+
+
+/*
+template <typename T>
+void Polynomial<T>::setRang(const int N)
+{
+    this->rang = N;
+    delete[] this->coefficient;
+    this->coefficient = nullptr;
+    this->coefficient = new Number[N];
+    for (size_t i = 0; i < this->rang; i++)
+    {
+        coefficient[i] = 0;
     }
 }
-
-template <class Number>
-Polynomial<Number>::~Polynomial()
+*/
+template <typename Poly_type>
+Polynomial<Poly_type> operator+(Polynomial<Poly_type>&& p, const Polynomial<Poly_type>& q)
 {
-    delete[] a;
+    //Polynomial<Number> temp(0, p.n > q.n ? p.n-1 : q.n-1);
+    assert(std::move(p.getRang()) == q.getRang());
+
+    //Polynomial<Poly_type> sum(std::forward<Poly_type>(p.getRang()));
+
+    for (size_t i = 0; i < p.getRang(); i++)
+    {
+        p.getCoeff(i) = p.getCoeff(i) + q.getCoeff(i);
+    }/*
+    for (size_t i = 0; i < sum.getRang(); i++)
+        sum.getCoeff(i) = sum.getCoeff(i) + q.getCoeff(i);*/
+    return std::move(p);
 }
 
-template <class Number>
-Polynomial<Number> operator+(Polynomial<Number>& p, Polynomial<Number>& q)
-{
-    Polynomial<Number> temp(0, p.n > q.n ? p.n-1 : q.n-1);
-
-    for (int i = 0; i < p.n; i++)
-        temp.a[i] += p.a[i];
-
-    for (int j = 0; j < q.n; j++)
-        temp.a[j] += q.a[j];
-
-    return temp;
-}
-
-
+/*
 template <class Number>
 bool operator<(Polynomial<Number>& p, Polynomial<Number>& q)
 {
     return p.evaluate(p.x) < q.evaluate(q.x) ? true : false;
-}
-
-template <class Number>
-Polynomial<Number> Polynomial<Number>::operator=(const Polynomial<Number>& p)
-{
-    if (this != &p)
-    {
-        assert(this->n == p.n);
-        this->n = p.n;
-
-        for (int i = 0; i < p.n; i++)
-            this->a[i] = p.a[i];
-    }
-    return *this;
-}
-/*
-int main(int argc, char const *argv[]) {
-    Polynomial<int> p(5, 3);
-    Polynomial<int> q(2, 3);
-    Polynomial<int> s(0, 5);
-
-    //p.setCoef();
-    //q.setCoef();
-
-    cout << p << endl << q << endl << s << endl;
-    cout << p.getRang() << endl << q.getRang() << endl << s.getRang() << endl;
-    //p.setValue(3);
-    //q.setValue(3);
-
-    s = p;
-    p = q;
-    q = s;
-     cout << p << endl << q << endl << s << endl;
-
-    /*cout << p << endl;
-    cout << q << endl;
-    if (p < q)
-        cout << p;
-    else
-        cout << q;
-
-    return 0;
 }*/
+
     }
 }

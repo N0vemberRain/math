@@ -11,20 +11,15 @@
 
 namespace My_math
 {
-namespace Vec
-{
+    namespace Vec
+    {
 
 template <typename T>
 class Vector
 {
 private:
-    size_t my_size;
-    T* data;
-
-    //static unsigned int n;      // Текущее число векторов
-    //static Vector* array[];     // Массив указателей на векторы
-
-    //unsigned int n = 0;
+    size_t my_size;         // Размер вектора
+    T* data;                // Указатель на соординаты вектора
 
 protected:
     T setX(T n) { data[0] = n; return data[0]; }
@@ -38,110 +33,56 @@ protected:
     auto absVec() const;
 
 public:
-    Vector() : my_size(0), data(nullptr) {}
-    Vector(size_t new_size)
-        : my_size(new_size), data(new T[my_size])
-    {
-        for (size_t i = 0; i < my_size; i++)
-            *(data+i) = 0;
-    }
+    Vector() : my_size(0), data(nullptr) {}         // Конструктор по умолчанию
+    explicit Vector(size_t new_size)                // Конструктор, задающий р-р
+    explicit Vector(std::initializer_list<T> list); // Конструктор, задающий координаты
 
-    Vector(std::initializer_list<T> list)
-        //: my_size(list.size()), coords(new T[my_size])
-    {
-        my_size = list.size();
-        data = new T[my_size];
-        size_t i = 0;
-        for (const auto& it : list)
-        {
-            *(data + i) = it;
-            i++;
-        }
-    }
+    Vector(Vector<T>&& v);                          // Конструктор перемещения
+    Vector& operator=(Vector<T>&& v);               // Перемещающий оператор присваивания
 
-    Vector(Vector<T>&& v)               // Конструктор перемещения
-        : my_size(v.my_size), data(v.data)
-    {
-        v.data = nullptr;
-        v.data = 0;
+    Vector(const Vector<T>& v);                     // Конструктор копирования
+    Vector<T>& operator=(const Vector<T>& v);       // Копирующее присваивание
 
-        std::cout << "[Vector] Move constr.\n";
-    }
-
-    Vector& operator=(Vector<T>&& v)    // Перемещающий оператор присваивания
-    {
-        assert(my_size == v.my_size);
-
-        std::swap(data, v.data);
-        std::cout << "[Vector] Move op. =\n";
-        return *this;
-    }
-    /*
-    Vector(const Vector<T>& v)
-        : my_size(v.my_size), data(new T[my_size])
-    {
-        //for (size_t i = 0; i < my_size; i++)
-        //    data[i] = v.data[i];
-
-        std::copy(&v.data[0], &v.data[v.my_size], &data[0]);
-
-        cout << "[Vector] Constr. Copy.\n";
-    }
-
-    Vector<T>& operator=(const Vector<T>& v)
-    {
-        if (this == &v)
-            return *this;
-
-        my_size = v.my_size;
-        data = new T[my_size];
-
-        //for (size_t i = 0; i < my_size; i++)
-        //    data[i] = v.data[i];
-        std::copy(&v.data[0], &v.data[v.my_size], &data[0]);
-        cout << "[Vector] Op. =\n";
-
-        return *this;
-    }
-*/
     virtual ~Vector()
     {
          delete[] data;
          std::cout << "[Vector] Kill.\n";
     }
 
-    T& operator[](size_t i);
+    T& operator[](size_t i);                        // Операторы доступа
     const T& operator[](size_t i) const;
-    const T at(size_t i) const;
 
-    size_t getSize() const { return my_size; }
+    size_t getSize() const { return my_size; }      // Вернуть размер вектора
 
+                                                    // Оператор вывода
     template <typename Type>
     friend std::ostream& operator<<(std::ostream& stream, const Vector<Type>& v);
 
+                                                    // Оператор ввода
     template <typename Type>
     friend std::istream& operator>>(std::istream& stream, Vector<Type>& v);
 
+                                                    // Операции с векторами
     template <typename Type>
     friend Vector<Type> operator+(const Vector<Type>& v, const Vector<Type>& u);
 
     template <typename Type>
     friend Vector<Type> operator-(const Vector<Type>& v, const Vector<Type>& u);
 
-    template <typename Type, typename Num>
-    friend Vector<Type> operator*(const Num n, const Vector<Type>& v);
+    template <typename Type, typename Scalar>       // Умножение вектора на число
+    friend Vector<Type> operator*(const Scalar n, const Vector<Type>& v);
 
-    template <typename Type>
+    template <typename Type>                        // Скалярное произведение векторов
     friend auto dotProductAlg(const Vector<Type>& v, const Vector<Type>& u);
 
-    template <typename Type>
+    template <typename Type>                        // Векторное произведение векторов
     friend Vector<Type> crossProduct(const Vector<Type>& v, const Vector<Type>& u);
 
-    void fileIn();
-    void fileInPos(int position);
-    void fileOut();
-    void fileIn_text();
-    void fileOut_text();
+    void fileIn();                         // Чтение из бинарного файла
+    void fileInPos(int position);          // Чтение из бинарного файла с указанием позиции
+    void fileOut();                        // Запись в бинарный файл
+    void fileIn_text();                    // Чтение из текстового файла
+    void fileOut_text();                   // Запись в текстовый файл
 /*
     static void addVector();
     static void showAll();
@@ -152,14 +93,75 @@ public:
     void readAll(istream&);
 */
 
-    struct exceptOut {};
-    struct exceptIn {};
-    struct exceptData {};
-
-
-
-
+    struct exceptOut {};                   // Исключения записи
+    struct exceptIn {};                    // Исключения чтения
+    //struct exceptData {};
 };
+
+template <typename T>
+Vector<T>::Vector() : my_size(0), data(nullptr) {}
+
+template <typename T>
+Vector<T>::Vector(const size_t new_size)
+    : my_size(new_size), data(new T[my_size])
+{
+    for (size_t i = 0; i < my_size; i++)
+        *(data+i) = 0;
+}
+
+template <typename T>
+Vector<T>::Vector(std::initializer_list<T> list)
+    : my_size(list.size()), data(new T[my_size])
+{
+    size_t i = 0;
+    for (const auto& it : list)
+    {
+        *(data + i) = it;
+        i++;
+    }
+}
+
+template <typename T>
+Vector<T>::Vector(Vector<T>&& v)
+    : my_size(v.my_size), data(v.data)
+{
+    v.data = nullptr;
+    v.data = 0;
+
+    std::cout << "[Vector] Move constr.\n";
+}
+
+template <typename T>
+Vector<T>& Vector<T>::operator=(Vector<T>&& v)
+{
+    assert(my_size == v.my_size);
+    std::swap(data, v.data);
+    std::cout << "[Vector] Move op. =\n";
+    return *this;
+}
+
+template <typename T>
+Vector<T>::Vector(const Vector<T>& v)
+    : my_size(v.my_size), data(new T[my_size])
+{
+    std::copy(&v.data[0], &v.data[v.my_size], &data[0]);
+    cout << "[Vector] Constr. Copy.\n";
+}
+
+template <typename T>
+Vector<T>& Vector<T>::operator=(const Vector<T>& v)
+{
+    if (this == &v)
+        return *this;
+
+    my_size = v.my_size;
+    data = new T[my_size];
+
+    std::copy(&v.data[0], &v.data[v.my_size], &data[0]);
+    cout << "[Vector] Op. =\n";
+
+    return *this;
+}
 
 /*
 template <typename T>
@@ -193,13 +195,6 @@ T& Vector<T>::operator[](size_t i)
 }
 
 template <typename T>
-const T Vector<T>::at(size_t i) const
-{
-    assert(i >= 0 && i < this->my_size);
-    return this->data[i];
-}
-
-template <typename T>
 std::ostream& operator<<(std::ostream& stream, const Vector<T>& v)
 {
     stream <<"( ";
@@ -227,7 +222,7 @@ void Vector<T>::fileIn()
     {
     T arr[this->my_size];
 
-    std::ifstream in_file;     // Создать поток ввода из файла.
+    std::ifstream in_file;                        // Создать поток ввода из файла.
     in_file.open("Vector.DAT", std::ios::binary); // Открыть поток
     if (!in_file)
     {
@@ -261,8 +256,8 @@ void Vector<T>::fileOut()
         arr[i] = this->data[i];
     }
 
-    std::ofstream out_file;   // Создать поток вывода в файл.
-    // Открыть потко вывода в файл.
+    std::ofstream out_file;                     // Создать поток вывода в файл.
+                                                // Открыть потко вывода в файл.
     out_file.open("Vector.DAT", std::ios::app | std::ios::binary);
     if (!out_file)
     {
@@ -270,7 +265,7 @@ void Vector<T>::fileOut()
         //cout << "Errer. Open file.\n";
         //return;
     }
-    // Запись в файл.
+                                                // Запись в файл.
     out_file.write(reinterpret_cast<char*>(arr), this->my_size * sizeof(T));
     out_file.close();
     }
@@ -292,14 +287,14 @@ void Vector<T>::fileInPos(int position)
     }
 
     in_file.seekg(0, std::ios::end);
-    // Вернуть указатель чтения на конечную позицию
+                                            // Вернуть указатель чтения на конечную позицию
     int endposition = in_file.tellg();
-    // Найти кол-во векторов в файле
+                                            // Найти кол-во векторов в файле
     int n = endposition / sizeof(T);
     std::cout << "In file " << n << " vectors.\n";
-    // Вычислить позицию для чтения
+                                            // Вычислить позицию для чтения
     int position_in_file = (position-1) * this->my_size * sizeof(T);
-    in_file.seekg(position_in_file); // Установить указатель чтения
+    in_file.seekg(position_in_file);        // Установить указатель чтения
     in_file.read(reinterpret_cast<char*>(arr), this->my_size * sizeof(T));
     in_file.close();
 
@@ -332,17 +327,6 @@ void Vector<T>::fileIn_text()
 template <typename T>
 Vector<T> operator+(const Vector<T>& v, const Vector<T>& u)
 {
-    /*
-    try
-    {
-        if (v.getSize() != u.getSize())
-            throw exceptData<T>();
-    }
-    catch (Vector<T>::exceptData<T>())
-    {
-        cerr << "Error: size is different.\n";
-    }
-*/
     assert(v.getSize() == u.getSize());
     Vector<T> sum(v.getSize());
     for (size_t i = 0; i < sum.getSize(); i++)
@@ -355,17 +339,6 @@ Vector<T> operator+(const Vector<T>& v, const Vector<T>& u)
 template <typename T>
 Vector<T> operator-(const Vector<T>& v, const Vector<T>& u)
 {
-    /*
-    try
-    {
-        if (v.getSize() != u.getSize())
-            throw Vector<T>::exceptData<T>();
-    }
-    catch (Vector<T>::exceptData<T>())
-    {
-        cerr << "Error: size is different.\n";
-    }
-*/
     assert(v.getSize() == u.getSize());
     Vector<T> subt(v.getSize());
     for (size_t i = 0; i < subt.getSize(); i++)
@@ -373,8 +346,8 @@ Vector<T> operator-(const Vector<T>& v, const Vector<T>& u)
     return subt;
 }
 
-template <typename T, typename Num>
-Vector<T> operator*(const Num n, const Vector<T>& v)
+template <typename T, typename Scalar>
+Vector<T> operator*(const Scalar n, const Vector<T>& v)
 {
     Vector<T> res(v.getSize());
     for (size_t i = 0; i < res.getSize(); i++)
@@ -412,24 +385,5 @@ auto Vector<T>::absVec() const
      return sqrt(pow(getX(), 2) + pow(getY(), 2) + pow(getZ(), 2));
 }
 
-template <typename T>
-auto simpleFoo(Vector<T> v)
-{
-    std::cout << v << "Simple Foo\n";
-    return v;
-}
-/*
-template <typename T>
-auto createVector(Vector<T>&& v)
-{
-    return Vector<T>(std::move(v));
-}
-
-template <typename T>
-auto createVector(const Vector<T> v)
-{
-    return
-}
-*/
-}
+    }
 }

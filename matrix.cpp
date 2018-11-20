@@ -4,7 +4,6 @@
 #include <fstream>
 #include <typeinfo>
 #include <vector>
-//#include <ostream>
 
 namespace My_math
 {
@@ -18,27 +17,27 @@ public:
 
     using value_type = T;
 
-    Matrix();
-    Matrix(size_t row, size_t column);
-    Matrix(const Matrix<T>& ob);
-    Matrix<T>& operator=(const Matrix<T>& m);
+    Matrix();                                    // Конструктор по умолчанию
+    Matrix(size_t row, size_t column);           // Конструктор, задающий р-р
+    Matrix(const Matrix<T>& ob);                 // Конструктор копирования
+    Matrix<T>& operator=(const Matrix<T>& m);    // Копирующее присваивание
     ~Matrix();
 
-    int getRow() const { return row; }
-    int getColumn() const { return column; }
+    int getRow() const { return row; }           // Вернуть кол-во строк
+    int getColumn() const { return column; }     // Вернуть кол-во столбцов
 
-    template <typename Type>
+    template <typename Type>                     // Оператор вывода
     friend std::ostream& operator<<(std::ostream& stream, const Matrix<Type>& m);
 
-    const T getData(size_t, size_t) const;
-    T& setData(const size_t, const size_t);
+    const T getData(size_t, size_t) const;       // Вернуть данные в поз. i, j
+    T& setData(const size_t, const size_t);      // Установить данные в поз. i, j
     void setElements();
-    Matrix<T> transposition(const Matrix<T>& m);
+    Matrix<T> transposition(const Matrix<T>& m); // Транспонирование матрицы
 
 private:
-    size_t row;
-    size_t column;
-    value_type **data;
+    size_t row;                                  // Кол-во строк
+    size_t column;                               // Кол-во столбцов
+    value_type **data;                           // Указатель на данные матрицы
 };
 
 template <typename T>
@@ -55,15 +54,6 @@ Matrix<T>::Matrix()
             data[i][j] = 0;
         }
     }
-/*
-    for (size_t i = 0; i < row; i++)
-    {
-        for (size_t j = 0; j < column; j++)
-        {
-            std::cout << data[i][j];
-        }
-    }*/
-
 }
 
 template <typename T>
@@ -80,14 +70,6 @@ Matrix<T>::Matrix(size_t row, size_t column)
             data[i][j] = 0;
         }
     }
-/*
-    for (size_t i = 0; i < row; i++)
-    {
-        for (size_t j = 0; j < column; j++)
-        {
-            std::cout << data[i][j];
-        }
-    }*/
 }
 
 template <typename T>
@@ -256,28 +238,17 @@ auto operator*(const Matrix<Value_type>& m, const Matrix<Value_type>& n)
     assert(m.getRow() == m.getColumn() && n.getRow() == n.getColumn());
 
     Matrix<Value_type> mult(m.getRow(), m.getColumn());
-    // std::vector<Value_type> temp_mult;
-    //Value_type sum = 0;
     size_t t = 0;
     for (size_t i = 0; i < mult.getRow(); i++)
     {
         for (size_t j = 0; j < mult.getColumn(); j++)
         {
-            //for (size_t k = 0; k < mult.getRow(); k++)
-            //{
-                while (t < m.getRow())
-                //for (size_t t = 0; t < m.getRow(); t++)
-                {
-                    mult.setData(i,j) = mult.getData(i,j) + (m.getData(i, t) * n.getData(t,j));
-                    t++;
-                }
-                t = 0;
-                //sum = temp_mult.
-                //mult.setData(i,j) = sum;
-                //sum = 0;
-        //    }
-
-            //temp_mult.clear();
+            while (t < m.getRow())
+            {
+                mult.setData(i,j) = mult.getData(i,j) + (m.getData(i, t) * n.getData(t,j));
+                t++;
+            }
+            t = 0;
         }
     }
     return mult;
@@ -285,16 +256,3 @@ auto operator*(const Matrix<Value_type>& m, const Matrix<Value_type>& n)
 
     }
 }
-/*
-int main()
-{
-    Matrix<int> M(3,3); Matrix<int> N(5, 5);
-    //std::cout << M << N;
-    N.setElements();
-    auto A = transposition(N);
-    std::cout << N << A;// typeid(N).name << A << typeid(A).name;
-    auto S = N - A;
-    std::cout << S ;//<< typeid(S).name;
-    return 0;
-}
-*/
