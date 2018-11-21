@@ -29,6 +29,9 @@ public:
     template <typename Type>                     // Оператор вывода
     friend std::ostream& operator<<(std::ostream& stream, const Matrix<Type>& m);
 
+    template <typename Type>                     // Оператор ввода
+    friend std::istream& operator>>(std::iostream& stream, Matrix<Type>& m);
+
     const T getData(size_t, size_t) const;       // Вернуть данные в поз. i, j
     T& setData(const size_t, const size_t);      // Установить данные в поз. i, j
     void setElements();
@@ -144,6 +147,20 @@ std::ostream& operator<<(std::ostream& stream, const Matrix<T>& m)
         stream << "|" << std::endl;
     }
     stream << std::endl;
+    return stream;
+}
+
+template <typename T>
+std::istream& operator>>(std::istream& stream, Matrix<T>& m)
+{
+    std::cout << "Enter elements:\n";
+    for (size_t i = 0; i < m.getRow(); i++)
+    {
+        for (size_t j = 0; j < m.getColumn(); j++)
+        {
+            stream >> m.setData(i, j);
+        }
+    }
     return stream;
 }
 

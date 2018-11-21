@@ -33,8 +33,8 @@ protected:
     auto absVec() const;
 
 public:
-    Vector() : my_size(0), data(nullptr) {}         // Конструктор по умолчанию
-    explicit Vector(size_t new_size)                // Конструктор, задающий р-р
+    Vector();                                       // Конструктор по умолчанию
+    explicit Vector(size_t new_size);               // Конструктор, задающий р-р
     explicit Vector(std::initializer_list<T> list); // Конструктор, задающий координаты
 
     Vector(Vector<T>&& v);                          // Конструктор перемещения
@@ -145,7 +145,7 @@ Vector<T>::Vector(const Vector<T>& v)
     : my_size(v.my_size), data(new T[my_size])
 {
     std::copy(&v.data[0], &v.data[v.my_size], &data[0]);
-    cout << "[Vector] Constr. Copy.\n";
+    std::cout << "[Vector] Constr. Copy.\n";
 }
 
 template <typename T>
@@ -158,7 +158,7 @@ Vector<T>& Vector<T>::operator=(const Vector<T>& v)
     data = new T[my_size];
 
     std::copy(&v.data[0], &v.data[v.my_size], &data[0]);
-    cout << "[Vector] Op. =\n";
+    std::cout << "[Vector] Op. =\n";
 
     return *this;
 }
@@ -208,7 +208,7 @@ std::ostream& operator<<(std::ostream& stream, const Vector<T>& v)
 template <typename T>
 std::istream& operator>>(std::istream& stream, Vector<T>& v)
 {
-    std::cout << "Enter coords: ";
+    std::cout << "Enter coords: \n";
     for (size_t i = 0; i < v.getSize(); i++)
         stream >> v.data[i];
 
@@ -331,7 +331,7 @@ Vector<T> operator+(const Vector<T>& v, const Vector<T>& u)
     Vector<T> sum(v.getSize());
     for (size_t i = 0; i < sum.getSize(); i++)
     {
-        sum[i] = v.at(i) + u.at(i);
+        sum[i] = v[i] + u[i];
     }
     return sum;
 }
@@ -387,3 +387,12 @@ auto Vector<T>::absVec() const
 
     }
 }
+/*
+using Vi = My_math::Vec::Vector<int>;
+using Vf = My_math::Vec::Vector<float>;
+int main()
+{
+    Vi v(5); Vf u{1.1, 2.2, 3.5};
+    std::cout << v << u;
+    return 0;
+}*/
