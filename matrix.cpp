@@ -79,7 +79,10 @@ template <typename T>
 Matrix<T>::Matrix(const Matrix<T>& m)
     : row(m.row), column(m.column)
 {
-    assert(row == m.row && column == m.column);
+    data = new value_type*[row];
+    for (size_t i = 0; i < row; i++)
+        data[i] = new T[column];
+
     for (size_t i = 0; i < row; i++)
     {
         for (size_t j = 0; j < column; j++)
