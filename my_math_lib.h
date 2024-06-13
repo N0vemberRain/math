@@ -1,7 +1,7 @@
 #include <initializer_list>
-#include "matrix.cpp"
-#include "vector.cpp"
-#include "polynomial.cpp"
+#include "matrix.h"
+#include "vector.h"
+#include "polynomial.h"
 
 namespace My_math
 {
